@@ -5,12 +5,13 @@ import { NotFoundError } from 'rxjs';
 import { TaskRepository } from './task.repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Task } from './task.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class TasksService {
   constructor(
-    @InjectRepository(TaskRepository)
-    private taskRepository: TaskRepository,
+    @InjectRepository(Task)
+    private taskRepository: Repository<Task>,
   ) {}
   // getAllTasks(): Task[] {
   //   return this.tasks;
