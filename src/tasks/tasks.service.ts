@@ -14,23 +14,8 @@ export class TasksService {
     @InjectRepository(Task)
     private taskRepository: Repository<Task>,
   ) {}
-  // getAllTasks(): Task[] {
-  //   return this.tasks;
-  // }
-  // getTasksWithFilter(filterDto: GetTasksFilterDto): Task[] {
-  //   const { status, search } = filterDto;
-  //   let tasks = this.getAllTasks();
-  //   if (status) {
-  //     tasks = tasks.filter((task) => task.status === status);
-  //   }
-  //   if (search) {
-  //     tasks = tasks.filter(
-  //       (task) =>
-  //         task.title.includes(search) || task.description.includes(search),
-  //     );
-  //   }
-  //   return tasks;
-  // }
+
+  getTasks(filterDto: GetTasksFilterDto) {}
 
   async getTaskByID(id: number): Promise<Task> {
     const found = await this.taskRepository.findOne({ where: { id: id } });
@@ -51,25 +36,23 @@ export class TasksService {
 
     return task;
   }
+  async deleteTaskByID(id: number): Promise<void> {
+    const result = await this.taskRepository.delete(id);
 
-  // createTask(createTaskDto: CreateTaskDto): Task {
-  //   const { title, description } = createTaskDto;
-  //   const task: Task = {
-  //     id: uuidv4(),
-  //     title,
-  //     description,
-  //     status: TaskStatus.OPEN,
-  //   };
-  //   this.tasks.push(task);
-  //   return task;
-  // }
-  // deleteTaskByID(id: string): void {
-  //   const found = this.getTaskByID(id);
-  //   this.tasks = this.tasks.filter((task) => task.id !== found.id);
-  // }
-  // updateTaskStatus(id: string, status: TaskStatus): Task {
-  //   const task = this.getTaskByID(id);
-  //   task.status = status;
-  //   return task;
-  // }
+    if (result.affected === 0) {
+      throw new NotFoundException(`Task with ID "${id}" not found`);
+    }
+
+    // else {
+    //   throw new NotFoundException(`Task with ID "${id}" deleted successfully`);
+    // }
+    console.log(result);
+  }
+
+  async updateTaskStatus(id: number, status: TaskStatus): Promise<Task> {
+    const task = await this.getTaskByID(id);
+    task.status = status;
+    await task.save();
+    return task;
+  }
 }
