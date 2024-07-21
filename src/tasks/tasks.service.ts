@@ -4,7 +4,7 @@ import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
 import { NotFoundError } from 'rxjs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Task } from './task.entity';
-import { Repository } from 'typeorm';
+import { createQueryBuilder, Repository } from 'typeorm';
 import { TaskRepository } from './taks.repository';
 import { TaskStatus } from './task-status.enum';
 
@@ -15,7 +15,24 @@ export class TasksService {
     private taskRepository: Repository<Task>,
   ) {}
 
-  getTasks(filterDto: GetTasksFilterDto) {}
+  async getTasks(filterDto: GetTasksFilterDto): Promise<Task[]> {
+    const { status, search } = filterDto;
+    const query = this.taskRepository.createQueryBuilder('task');
+
+    if (status) {
+      query.andWhere('task.status = :status', { status });
+    }
+
+    if (search) {
+      query.andWhere(
+        '(task.title LIKE :search OR task.description LIKE :search)',
+        { search: `%${search}%` },
+      );
+    }
+
+    const tasks = await query.getMany();
+    return tasks;
+  }
 
   async getTaskByID(id: number): Promise<Task> {
     const found = await this.taskRepository.findOne({ where: { id: id } });
