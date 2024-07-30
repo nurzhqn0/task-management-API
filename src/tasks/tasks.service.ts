@@ -10,7 +10,6 @@ import { NotFoundError } from 'rxjs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Task } from './task.entity';
 import { createQueryBuilder, Repository } from 'typeorm';
-import { TaskRepository } from './taks.repository';
 import { TaskStatus } from './task-status.enum';
 import { User } from 'src/auth/user.entity';
 
